@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { API_URL } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 
 function GoogleIcon({ className }: { className?: string }) {
@@ -29,28 +27,17 @@ function GoogleIcon({ className }: { className?: string }) {
 }
 
 export function GoogleButton() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
-  const handleClick = () => {
-    setLoading(true);
-    setTimeout(() => router.push("/"), 900);
-  };
-
   return (
     <Button
       type="button"
       variant="outline"
-      onClick={handleClick}
-      disabled={loading}
+      onClick={() => {
+        window.location.href = `${API_URL}/auth/google`;
+      }}
       className="h-11 w-full rounded-full text-sm font-medium"
     >
-      {loading ? (
-        <Loader2 className="size-4 animate-spin" />
-      ) : (
-        <GoogleIcon className="size-4" />
-      )}
-      {loading ? "Conectando..." : "Continuar com o Google"}
+      <GoogleIcon className="size-4" />
+      Continuar com o Google
     </Button>
   );
 }

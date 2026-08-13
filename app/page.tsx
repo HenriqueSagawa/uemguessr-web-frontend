@@ -7,21 +7,24 @@ import { GameModes } from "@/components/game-modes";
 import { Competitive } from "@/components/competitive";
 import { Quiz } from "@/components/quiz";
 import { Footer } from "@/components/footer";
+import { RedirectIfAuthed } from "@/components/auth/redirect-if-authed";
 
 export default function Home() {
   return (
-    <div>
-      <Header />
-      <main>
-        <Hero />
-        <Idea />
-        <HowItWorks />
-        <Demo />
-        <GameModes />
-        <Competitive />
-        <Quiz />
-      </main>
-      <Footer />
-    </div>
+    <RedirectIfAuthed>
+      <div>
+        <Header />
+        <main>
+          <Hero />
+          <Idea />
+          <HowItWorks />
+          <Demo />
+          <GameModes />
+          <Competitive />
+          <Quiz />
+        </main>
+        <Footer />
+      </div>
+    </RedirectIfAuthed>
   );
 }

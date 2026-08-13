@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { EmailVerification } from "@/components/auth/email-verification";
+import { RedirectIfAuthed } from "@/components/auth/redirect-if-authed";
 
 export const metadata: Metadata = {
   title: "Verifique seu email | UEMGuessr",
@@ -14,5 +15,9 @@ export default async function VerifyEmailPage({
   const params = await searchParams;
   const email = Array.isArray(params.email) ? params.email[0] : params.email;
 
-  return <EmailVerification email={email} />;
+  return (
+    <RedirectIfAuthed>
+      <EmailVerification email={email} />
+    </RedirectIfAuthed>
+  );
 }

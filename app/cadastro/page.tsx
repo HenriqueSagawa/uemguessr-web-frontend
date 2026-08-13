@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SignupForm } from "@/components/auth/signup-form";
+import { RedirectIfAuthed } from "@/components/auth/redirect-if-authed";
 
 export const metadata: Metadata = {
   title: "Criar conta | UEMGuessr",
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function SignupPage() {
-  return <SignupForm />;
+  return (
+    <RedirectIfAuthed>
+      <SignupForm />
+    </RedirectIfAuthed>
+  );
 }

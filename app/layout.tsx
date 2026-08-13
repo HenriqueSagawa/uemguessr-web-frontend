@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Inter, Space_Grotesk } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+import { SessionProvider } from "@/lib/session";
 import "./globals.css";
 
 const inter = Inter({
@@ -36,7 +38,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             __html: `(function(){try{var t=localStorage.getItem("uemguessr-theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.toggle("dark",d)}catch(e){}})();`,
           }}
         />
-        {children}
+        <SessionProvider>
+          {children}
+          <Toaster position="bottom-right" richColors />
+        </SessionProvider>
       </body>
     </html>
   );

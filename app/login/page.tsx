@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/auth/login-form";
+import { RedirectIfAuthed } from "@/components/auth/redirect-if-authed";
 
 export const metadata: Metadata = {
   title: "Entrar | UEMGuessr",
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function LoginPage() {
-  return <LoginForm />;
+  return (
+    <RedirectIfAuthed>
+      <LoginForm />
+    </RedirectIfAuthed>
+  );
 }

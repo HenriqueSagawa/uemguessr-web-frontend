@@ -1,13 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2, Mail, RefreshCw } from "lucide-react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { OtpInput } from "@/components/auth/otp-input";
 import { useCountdown } from "@/components/auth/use-countdown";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { api, ApiError, setAccessToken } from "@/lib/api";
+import type { AuthTokens } from "@/lib/api-types";
+import { useSession } from "@/lib/session";
 
 function maskEmail(email: string) {
   if (!email.includes("@")) return email;
@@ -20,28 +26,70 @@ interface EmailVerificationProps {
   email?: string;
 }
 
-export function EmailVerification({ email }: EmailVerificationProps) {
-  const target = email ?? "seuemail@email.com";
+export function EmailVerification({ email: emailFromUrl }: EmailVerificationProps) {
+  const router = useRouter();
+  const { completeAuth } = useSession();
+  const [email, setEmail] = useState(emailFromUrl ?? "");
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [verified, setVerified] = useState(false);
   const { seconds, start } = useCountdown(60, true);
 
-  const handleSubmit = (value = code) => {
+  const target = email || "seuemail@email.com";
+
+  useEffect(() => {
+    if (verified) {
+      const timer = setTimeout(() => router.push("/lobby"), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [verified, router]);
+
+  const handleSubmit = async (value = code) => {
     setError(null);
     if (value.length < 6) return;
+    if (!email.trim()) {
+      setError("Digite o email usado no cadastro.");
+      return;
+    }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const response = await api<AuthTokens>("/auth/verify-email", {
+        method: "POST",
+        body: JSON.stringify({ email: email.trim(), code: value }),
+      });
+      setAccessToken(response.accessToken);
+      completeAuth(response.user);
       setVerified(true);
-    }, 900);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError("Não foi possível conectar ao servidor.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setCode("");
     setError(null);
-    start();
+    if (!email.trim()) {
+      setError("Digite o email usado no cadastro.");
+      return;
+    }
+    try {
+      await api("/auth/resend-code", {
+        method: "POST",
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      start();
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+      }
+    }
   };
 
   if (verified) {
@@ -55,24 +103,16 @@ export function EmailVerification({ email }: EmailVerificationProps) {
             Email verificado!
           </h1>
           <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
-            Sua conta está pronta. Agora é só entrar e provar que você conhece a
-            UEM.
+            Sua conta está pronta. Levando você para o lobby...
           </p>
         </div>
 
-        <div className="mt-8 flex flex-col gap-3">
+        <div className="mt-8">
           <Button
-            render={<Link href="/login" />}
+            onClick={() => router.push("/lobby")}
             className="h-11 w-full rounded-full text-sm font-semibold"
           >
-            Ir para o login
-          </Button>
-          <Button
-            variant="outline"
-            render={<Link href="/" />}
-            className="h-11 w-full rounded-full text-sm font-medium"
-          >
-            Voltar para a home
+            Entrar no jogo
           </Button>
         </div>
       </AuthShell>
@@ -88,7 +128,7 @@ export function EmailVerification({ email }: EmailVerificationProps) {
         <p className="text-sm leading-relaxed text-muted-foreground">
           Enviamos um código de 6 dígitos para{" "}
           <span className="font-medium text-foreground">{maskEmail(target)}</span>
-          . Ele expira em 10 minutos.
+          . Ele expira em 15 minutos.
         </p>
       </div>
 
@@ -100,6 +140,24 @@ export function EmailVerification({ email }: EmailVerificationProps) {
         className="mt-8 flex flex-col gap-5"
         noValidate
       >
+        {!emailFromUrl ? (
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="verify-email" className="text-[13px]">
+              Email usado no cadastro
+            </Label>
+            <Input
+              id="verify-email"
+              type="email"
+              autoComplete="email"
+              placeholder="voce@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="h-11 rounded-xl px-3.5"
+              required
+            />
+          </div>
+        ) : null}
+
         <OtpInput
           length={6}
           value={code}

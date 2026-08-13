@@ -86,14 +86,14 @@ export function Quiz() {
 
               <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                 <Button
-                  render={<Link href="/jogar" />}
+                  render={<Link href="/lobby" />}
                   className="group h-12 rounded-full bg-white px-8 text-sm font-semibold text-slate-900 hover:bg-white/90"
                 >
                   Eu conheço. Provar.
                   <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />
                 </Button>
                 <Button
-                  render={<Link href="/ranking" />}
+                  render={<Link href="/lobby/ranking" />}
                   className="h-12 rounded-full border-white/20 bg-white/10 px-6 text-sm font-semibold text-white hover:bg-white/20"
                 >
                   Ver ranking

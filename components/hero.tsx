@@ -120,7 +120,7 @@ export function Hero() {
             className="mt-9 flex flex-col gap-3 sm:flex-row"
           >
             <Button
-              render={<Link href="/play" />}
+              render={<Link href="/lobby" />}
               className="group relative h-12 overflow-hidden rounded-full px-8 text-sm font-semibold shadow-lg shadow-foreground/10"
             >
               <span className="relative z-10 flex items-center gap-2">

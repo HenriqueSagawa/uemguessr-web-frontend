@@ -11,24 +11,36 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { api, ApiError } from "@/lib/api";
+
+const USERNAME_RE = /^[a-zA-Z0-9_]{3,30}$/;
 
 export function SignupForm() {
   const router = useRouter();
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [ra, setRa] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [terms, setTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
 
-    if (!name.trim() || !email.trim() || !password) {
-      setError("Preencha nome, email e senha para criar sua conta.");
+    if (!USERNAME_RE.test(username)) {
+      setError(
+        "O apelido precisa ter de 3 a 30 caracteres, usando só letras, números e underscore."
+      );
+      return;
+    }
+    if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email.trim())) {
+      setError("Digite um email válido.");
+      return;
+    }
+    if (password.length < 8) {
+      setError("A senha precisa ter pelo menos 8 caracteres.");
       return;
     }
     if (password !== confirm) {
@@ -41,13 +53,25 @@ export function SignupForm() {
     }
 
     setLoading(true);
-    setTimeout(
-      () =>
-        router.push(
-          `/verificar-email?email=${encodeURIComponent(email.trim())}`
-        ),
-      900
-    );
+    try {
+      await api("/auth/register", {
+        method: "POST",
+        body: JSON.stringify({ username, email: email.trim(), password }),
+      });
+      router.push(`/verificar-email?email=${encodeURIComponent(email.trim())}`);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.status === 409) {
+          setError("Esse apelido ou email já está em uso. Tente outro.");
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError("Não foi possível conectar ao servidor.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,16 +87,21 @@ export function SignupForm() {
 
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5" noValidate>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="name" className="text-[13px]">
-            Nome completo
-          </Label>
+          <div className="flex items-baseline justify-between">
+            <Label htmlFor="username" className="text-[13px]">
+              Apelido
+            </Label>
+            <span className="text-[11px] text-muted-foreground">
+              Seu nome de guerra no campus
+            </span>
+          </div>
           <Input
-            id="name"
+            id="username"
             type="text"
-            autoComplete="name"
-            placeholder="Seu nome"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            autoComplete="username"
+            placeholder="ex: joao_silva"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="h-11 rounded-xl px-3.5"
             required
           />
@@ -91,27 +120,6 @@ export function SignupForm() {
             onChange={(e) => setEmail(e.target.value)}
             className="h-11 rounded-xl px-3.5"
             required
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <div className="flex items-baseline justify-between">
-            <Label htmlFor="ra" className="text-[13px]">
-              RA (opcional)
-            </Label>
-            <span className="text-[11px] text-muted-foreground">
-              Somente para quem é da UEM
-            </span>
-          </div>
-          <Input
-            id="ra"
-            type="text"
-            autoComplete="off"
-            inputMode="numeric"
-            placeholder="12345-6"
-            value={ra}
-            onChange={(e) => setRa(e.target.value.replace(/\D/g, ""))}
-            className="h-11 rounded-xl px-3.5"
           />
         </div>
 

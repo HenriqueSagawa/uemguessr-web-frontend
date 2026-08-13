@@ -8,28 +8,55 @@ import { AuthShell } from "@/components/auth/auth-shell";
 import { GoogleButton } from "@/components/auth/google-button";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { api, ApiError, setAccessToken } from "@/lib/api";
+import type { AuthTokens } from "@/lib/api-types";
+import { useSession } from "@/lib/session";
 
 export function LoginForm() {
   const router = useRouter();
+  const { completeAuth } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [unverified, setUnverified] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
+    setUnverified(false);
     if (!email.trim() || !password) {
       setError("Preencha email e senha para entrar.");
       return;
     }
     setLoading(true);
-    setTimeout(() => router.push("/"), 900);
+    try {
+      const response = await api<AuthTokens>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
+      setAccessToken(response.accessToken);
+      completeAuth(response.user);
+      router.push("/lobby");
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.status === 403) {
+          setUnverified(true);
+          setError(err.message);
+        } else if (err.status === 401) {
+          setError("Email ou senha inválidos.");
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError("Não foi possível conectar ao servidor.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -84,18 +111,20 @@ export function LoginForm() {
         </div>
 
         {error ? (
-          <p role="alert" className="text-[13px] font-medium text-destructive">
-            {error}
-          </p>
+          <div className="flex flex-col gap-1">
+            <p role="alert" className="text-[13px] font-medium text-destructive">
+              {error}
+            </p>
+            {unverified ? (
+              <Link
+                href={`/verificar-email?email=${encodeURIComponent(email.trim())}`}
+                className="text-[13px] font-medium text-primary transition-opacity hover:opacity-80"
+              >
+                Reenviar código de verificação
+              </Link>
+            ) : null}
+          </div>
         ) : null}
-
-        <Label className="flex cursor-pointer items-center gap-2 text-[13px] font-normal text-muted-foreground">
-          <Checkbox
-            checked={remember}
-            onCheckedChange={(checked) => setRemember(checked === true)}
-          />
-          Lembrar de mim por 30 dias
-        </Label>
 
         <Button
           type="submit"

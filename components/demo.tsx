@@ -61,7 +61,7 @@ export function Demo() {
                       </p>
                     </div>
                     <Button
-                      render={<Link href="/jogar" />}
+                      render={<Link href="/lobby" />}
                       className="rounded-full px-6"
                     >
                       Começar a jogar

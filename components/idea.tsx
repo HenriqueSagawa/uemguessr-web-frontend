@@ -105,7 +105,7 @@ export function Idea() {
                 A primeira partida é sua.
               </p>
               <Button
-                render={<Link href="/jogar" />}
+                render={<Link href="/lobby" />}
                 className="rounded-full px-6"
               >
                 Jogar agora

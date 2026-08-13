@@ -93,7 +93,7 @@ export function Competitive() {
             </ul>
 
             <Button
-              render={<Link href="/ranking" />}
+              render={<Link href="/lobby/ranking" />}
               className="group mt-4 rounded-full px-6"
             >
               Entrar no ranking

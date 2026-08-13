@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ResetPasswordFlow } from "@/components/auth/reset-password-flow";
+import { RedirectIfAuthed } from "@/components/auth/redirect-if-authed";
 
 export const metadata: Metadata = {
   title: "Redefinir senha | UEMGuessr",
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function ForgotPasswordPage() {
-  return <ResetPasswordFlow />;
+  return (
+    <RedirectIfAuthed>
+      <ResetPasswordFlow />
+    </RedirectIfAuthed>
+  );
 }

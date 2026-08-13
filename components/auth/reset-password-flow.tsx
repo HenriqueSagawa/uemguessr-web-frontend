@@ -11,6 +11,7 @@ import { useCountdown } from "@/components/auth/use-countdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { api, ApiError } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const STEPS = [
@@ -35,7 +36,7 @@ export function ResetPasswordFlow() {
     setStep(next);
   };
 
-  const handleSendCode = (event: React.FormEvent) => {
+  const handleSendCode = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
     if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email.trim())) {
@@ -43,11 +44,22 @@ export function ResetPasswordFlow() {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await api("/auth/forgot-password", {
+        method: "POST",
+        body: JSON.stringify({ email: email.trim() }),
+      });
       start();
       goToStep(2);
-    }, 700);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError("Não foi possível conectar ao servidor.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleVerifyCode = () => {
@@ -56,10 +68,26 @@ export function ResetPasswordFlow() {
     setTimeout(() => {
       setLoading(false);
       goToStep(3);
-    }, 900);
+    }, 500);
   };
 
-  const handleReset = (event: React.FormEvent) => {
+  const handleResend = async () => {
+    setCode("");
+    setError(null);
+    try {
+      await api("/auth/forgot-password", {
+        method: "POST",
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      start();
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+      }
+    }
+  };
+
+  const handleReset = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
     if (password.length < 8) {
@@ -71,10 +99,25 @@ export function ResetPasswordFlow() {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await api("/auth/reset-password", {
+        method: "POST",
+        body: JSON.stringify({
+          email: email.trim(),
+          code,
+          newPassword: password,
+        }),
+      });
       setDone(true);
-    }, 900);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError("Não foi possível conectar ao servidor.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (done) {
@@ -129,7 +172,7 @@ export function ResetPasswordFlow() {
             {step === 1 &&
               "Digite seu email e enviaremos um código para redefinir sua senha."}
             {step === 2 &&
-              "Enviamos um código de 6 dígitos. Insira-o abaixo para continuar."}
+              "Enviamos um código de 6 dígitos. Ele expira em 15 minutos."}
             {step === 3 &&
               "Escolha uma senha nova. Tente algo que nem você adivinha depois."}
           </p>
@@ -255,10 +298,7 @@ export function ResetPasswordFlow() {
 
           <button
             type="button"
-            onClick={() => {
-              setCode("");
-              start();
-            }}
+            onClick={handleResend}
             disabled={seconds > 0}
             className="mx-auto flex cursor-pointer items-center gap-2 text-sm font-medium text-primary transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
           >
