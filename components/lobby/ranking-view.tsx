@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2, Trophy } from "lucide-react";
+import { Trophy } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useLobbyData } from "@/lib/lobby-data";
 import { SectionHeading } from "@/components/lobby/section-heading";
 import { RankRow, type RankRowEntry } from "@/components/lobby/rank-row";
@@ -39,10 +40,22 @@ export function RankingView() {
 
       <div className="rounded-3xl border bg-card p-4 sm:p-6">
         {loading ? (
-          <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" />
-            Carregando ranking...
-          </div>
+          <ol className="flex flex-col">
+            {Array.from({ length: 10 }).map((_, index) => (
+              <li
+                key={index}
+                className="flex items-center gap-3 rounded-2xl px-3 py-2.5 sm:gap-4 sm:px-4"
+              >
+                <Skeleton className="size-7 shrink-0" />
+                <Skeleton className="size-8 shrink-0 rounded-full" />
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <Skeleton className="h-3.5 w-32" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+                <Skeleton className="h-4 w-12" />
+              </li>
+            ))}
+          </ol>
         ) : error && top.length === 0 ? (
           <p className="py-10 text-center text-sm text-muted-foreground">
             Não foi possível carregar o ranking agora. Tente de novo em instantes.

@@ -4,6 +4,7 @@ import { Flame, Trophy } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/lib/session";
 import { useLobbyData } from "@/lib/lobby-data";
 import { divisionProgress, initialsOf } from "@/lib/ranked";
@@ -42,6 +43,39 @@ function StatBlock({
   );
 }
 
+function PlayerCardSkeleton() {
+  return (
+    <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex items-center gap-4 sm:gap-5">
+        <div className="rounded-full bg-linear-to-br from-blue-500/20 to-violet-500/20 p-1">
+          <Skeleton className="size-16 rounded-full sm:size-20" />
+        </div>
+        <div className="flex flex-col gap-2.5">
+          <Skeleton className="h-3 w-32" />
+          <Skeleton className="h-6 w-44" />
+          <Skeleton className="h-4 w-28" />
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <Skeleton className="h-6 w-24 rounded-full" />
+            <Skeleton className="h-6 w-24 rounded-full" />
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-6 rounded-2xl border bg-muted/40 px-6 py-5 sm:gap-10 sm:px-10">
+        {[0, 1, 2].map((item) => (
+          <div
+            key={item}
+            className="flex flex-col items-center gap-2 sm:items-start"
+          >
+            <Skeleton className="h-8 w-16" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function PlayerCard() {
   const { user } = useSession();
   const { profile, ranked, rankedStats, loading } = useLobbyData();
@@ -66,7 +100,10 @@ export function PlayerCard() {
         className="pointer-events-none absolute -bottom-24 -left-16 size-64 rounded-full bg-violet-500/10 blur-3xl"
       />
 
-      <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+      {loading ? (
+        <PlayerCardSkeleton />
+      ) : (
+        <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4 sm:gap-5">
           <div className="rounded-full bg-linear-to-br from-blue-500/20 to-violet-500/20 p-1">
             <Avatar className="size-16 sm:size-20">
@@ -115,6 +152,7 @@ export function PlayerCard() {
           <StatBlock value={matches ?? 0} label="Partidas" />
         </div>
       </div>
+      )}
 
       {division ? (
         <div className="relative mt-8 flex items-center gap-3">

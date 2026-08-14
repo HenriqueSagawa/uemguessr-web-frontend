@@ -36,7 +36,7 @@ export function LobbyDataProvider({ children }: { children: React.ReactNode }) {
     leaderboard: null,
     daily: null,
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
 

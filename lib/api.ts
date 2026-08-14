@@ -24,14 +24,44 @@ export interface ApiEnvelope<T> {
   };
 }
 
+const TOKEN_STORAGE_KEY = "uemguessr-access-token";
+
 let accessToken: string | null = null;
+let accessTokenLoaded = false;
+
+function readTokenFromStorage(): string | null {
+  try {
+    if (typeof window !== "undefined") {
+      return window.localStorage.getItem(TOKEN_STORAGE_KEY);
+    }
+  } catch {
+    // storage indisponível — segue com sessão só em memória
+  }
+  return null;
+}
 
 export function getAccessToken() {
+  if (!accessTokenLoaded) {
+    accessTokenLoaded = true;
+    accessToken = readTokenFromStorage();
+  }
   return accessToken;
 }
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
+  accessTokenLoaded = true;
+  try {
+    if (typeof window !== "undefined") {
+      if (token) {
+        window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
+      } else {
+        window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+      }
+    }
+  } catch {
+    // storage indisponível — mantém o token só em memória
+  }
 }
 
 let refreshInFlight: Promise<string | null> | null = null;

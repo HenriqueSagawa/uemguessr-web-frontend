@@ -8,7 +8,6 @@ import {
   Gauge,
   Target,
   Trophy,
-  Loader2,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import type {
@@ -17,6 +16,7 @@ import type {
 } from "@/lib/api-types";
 import { Progress } from "@/components/ui/progress";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useLobbyData } from "@/lib/lobby-data";
 import { divisionProgress } from "@/lib/ranked";
 import { cn } from "@/lib/utils";
@@ -147,31 +147,45 @@ export function StatsView() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          icon={Gauge}
-          label="Rating atual"
-          value={rating}
-          ticker
-          tickerClassName="bg-linear-to-br from-blue-400 to-violet-500"
-        />
-        <StatCard
-          icon={Trophy}
-          label="Melhor rating"
-          value={bestRating}
-          ticker
-          tickerClassName="bg-linear-to-br from-amber-400 to-orange-500"
-        />
-        <StatCard
-          icon={Target}
-          label="Taxa de vitória"
-          value={rankedStats?.profile.winRate ?? 0}
-          suffix="%"
-        />
-        <StatCard
-          icon={Gamepad2}
-          label="Partidas"
-          value={totalMatches}
-        />
+        {loading ? (
+          Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="rounded-3xl border bg-card p-5 sm:p-6">
+              <div className="flex items-center justify-between gap-2">
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="size-4" />
+              </div>
+              <Skeleton className="mt-3 h-8 w-24" />
+            </div>
+          ))
+        ) : (
+          <>
+            <StatCard
+              icon={Gauge}
+              label="Rating atual"
+              value={rating}
+              ticker
+              tickerClassName="bg-linear-to-br from-blue-400 to-violet-500"
+            />
+            <StatCard
+              icon={Trophy}
+              label="Melhor rating"
+              value={bestRating}
+              ticker
+              tickerClassName="bg-linear-to-br from-amber-400 to-orange-500"
+            />
+            <StatCard
+              icon={Target}
+              label="Taxa de vitória"
+              value={rankedStats?.profile.winRate ?? 0}
+              suffix="%"
+            />
+            <StatCard
+              icon={Gamepad2}
+              label="Partidas"
+              value={totalMatches}
+            />
+          </>
+        )}
       </div>
 
       <section className="flex flex-col gap-6">
@@ -193,7 +207,16 @@ export function StatsView() {
           }
         />
         <div className="rounded-3xl border bg-card p-6">
-          {division ? (
+          {loading ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+              <Skeleton className="h-2.5 w-full" />
+              <Skeleton className="h-3 w-36" />
+            </div>
+          ) : division ? (
             <>
               <div className="flex items-center justify-between text-sm">
                 <span className="font-medium">{division.current}</span>
@@ -208,9 +231,7 @@ export function StatsView() {
             </>
           ) : (
             <p className="py-4 text-sm text-muted-foreground">
-              {loading
-                ? "Carregando..."
-                : "Nenhuma temporada ranqueada ativa no momento."}
+              Nenhuma temporada ranqueada ativa no momento.
             </p>
           )}
         </div>
@@ -276,10 +297,18 @@ export function StatsView() {
         />
         <div className="overflow-hidden rounded-3xl border bg-card">
           {classic === null && rankedMatches === null ? (
-            <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" />
-              Carregando histórico...
-            </div>
+            <ul className="flex flex-col">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <li
+                  key={index}
+                  className="flex items-center gap-3 border-b border-border/50 px-4 py-3.5 last:border-0 sm:gap-4 sm:px-6"
+                >
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-24 flex-1" />
+                  <Skeleton className="h-4 w-16" />
+                </li>
+              ))}
+            </ul>
           ) : recent.length === 0 ? (
             <p className="py-10 text-center text-sm text-muted-foreground">
               Nenhuma partida ainda. O campus espera por você.
