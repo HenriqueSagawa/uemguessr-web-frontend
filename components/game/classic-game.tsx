@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Gauge, Loader2, MapPin, Trophy } from "lucide-react";
+import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { GameShell } from "@/components/game/game-shell";
 import { PanoViewer } from "@/components/game/pano-viewer";
@@ -19,6 +20,8 @@ import type {
 } from "@/lib/api-types";
 import { formatDistance, formatScore } from "@/lib/format";
 import { toast } from "sonner";
+import { playSound } from "@/lib/sounds";
+import { cn } from "@/lib/utils";
 
 type Phase = "loading" | "guess" | "roundResult" | "result" | "error";
 
@@ -41,6 +44,7 @@ export function ClassicGame() {
     setRound(current);
     locationIdRef.current = current.location.id;
     setPhase("guess");
+    playSound("roundStart");
   }, []);
 
   useEffect(() => {
@@ -78,6 +82,7 @@ export function ClassicGame() {
       setGame(result.game);
       setGuess(null);
       setPhase("roundResult");
+      playSound("score");
     } catch (err) {
       toast(err instanceof ApiError ? err.message : "Falha ao enviar o palpite.");
     } finally {
@@ -97,6 +102,7 @@ export function ClassicGame() {
         );
         setSummary(detail);
         setPhase("result");
+        playSound("win");
         return;
       }
       await loadCurrentRound(gameIdRef.current);
@@ -138,6 +144,8 @@ export function ClassicGame() {
     })();
   };
 
+  const currentRoundNumber = round?.roundNumber ?? (game?.roundsPlayed ?? 0) + 1;
+
   if (phase === "error") {
     return (
       <GameShell title="Partida clássica">
@@ -173,7 +181,12 @@ export function ClassicGame() {
 
   if (phase === "roundResult" && lastRound) {
     return (
-      <GameShell title="Partida clássica" fullBleed>
+      <GameShell
+        title="Partida clássica"
+        subtitle={`Rodada ${lastRound.roundNumber} de ${TOTAL_ROUNDS}`}
+        fullBleed
+        showQuitButton={false}
+      >
         <div className="h-full w-full p-4">
           <RoundResultView
             roundNumber={lastRound.roundNumber}
@@ -214,11 +227,12 @@ export function ClassicGame() {
       stats.push({ icon: Trophy, label: "Melhor rodada", value: formatScore(best) });
     }
     return (
-      <GameShell title="Partida clássica">
+      <GameShell title="Partida clássica" showQuitButton={false}>
         <GameResult
           title="Partida concluída"
           subtitle="Você mapeou mais um pedaço do campus de cor."
           score={game.score}
+          maxScore={TOTAL_ROUNDS * 5000}
           stats={stats}
           onReplay={replay}
         />
@@ -226,8 +240,13 @@ export function ClassicGame() {
     );
   }
 
+  // Guess phase
   return (
-    <GameShell title="Partida clássica" fullBleed>
+    <GameShell
+      title="Partida clássica"
+      subtitle={`Rodada ${currentRoundNumber} de ${TOTAL_ROUNDS}`}
+      fullBleed
+    >
       <div className="relative h-full w-full overflow-hidden rounded-none bg-black">
         {round?.location.imageUrl ? (
           <PanoViewer imageUrl={round.location.imageUrl} alt="Lugar a ser adivinhado" />
@@ -237,24 +256,47 @@ export function ClassicGame() {
           </div>
         )}
 
+        {/* Round progress dots — top center */}
+        <div className="pointer-events-none absolute left-1/2 top-4 z-[1001] -translate-x-1/2 flex items-center gap-2 rounded-full border bg-black/60 px-4 py-2 backdrop-blur-md">
+          {Array.from({ length: TOTAL_ROUNDS }, (_, i) => (
+            <div
+              key={i}
+              className={cn(
+                "rounded-full transition-all duration-300",
+                i < currentRoundNumber - 1
+                  ? "size-2.5 bg-amber-400"
+                  : i === currentRoundNumber - 1
+                  ? "size-3 bg-white shadow-[0_0_6px_2px_rgba(255,255,255,0.5)]"
+                  : "size-2 bg-white/30"
+              )}
+            />
+          ))}
+        </div>
+
+        {/* Score badge — top left */}
         <div className="pointer-events-none absolute left-4 top-4 flex flex-col gap-2">
           <span className="w-fit rounded-full bg-background/85 px-3 py-1.5 text-xs font-medium shadow-sm backdrop-blur-sm">
-            Rodada {round?.roundNumber} de {round?.totalRounds}
-          </span>
-          <span className="w-fit rounded-full bg-background/85 px-3 py-1.5 text-xs font-medium tabular-nums shadow-sm backdrop-blur-sm">
             Placar: {formatScore(game?.score ?? 0)} pts
           </span>
         </div>
 
-        <div className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
-          Onde fica isso?
-        </div>
+        {!guess && (
+          <div className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+            Onde fica isso?
+          </div>
+        )}
 
         <GuessMinimap
           guess={guess}
-          onGuess={setGuess}
+          onGuess={(pt) => {
+            setGuess(pt);
+            playSound("confirm");
+          }}
           onClear={() => setGuess(null)}
-          onConfirm={submitGuess}
+          onConfirm={() => {
+            playSound("confirm");
+            submitGuess();
+          }}
           submitting={busy}
           disabled={phase !== "guess"}
         />

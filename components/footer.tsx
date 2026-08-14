@@ -44,7 +44,7 @@ const socials = [
   },
   {
     label: "E-mail",
-    href: "mailto:contato@uemguessr.dev",
+    href: "mailto:uemguessr@gmail.com",
     icon: (props: SVGProps<SVGSVGElement>) => <Mail aria-hidden {...props} />,
   },
 ];
@@ -56,14 +56,14 @@ const FOOTER_LINKS = [
       { label: "Como funciona", href: "#como-funciona" },
       { label: "Modos de jogo", href: "#modos" },
       { label: "Demonstração", href: "#demonstracao" },
-      { label: "Competitivo", href: "#competitivo" },
+      { label: "Ranking", href: "/lobby/ranking" },
     ],
   },
   {
     title: "Jogo",
     links: [
       { label: "Jogar", href: "/jogar" },
-      { label: "Ranking", href: "/ranking" },
+      { label: "Ranking", href: "/lobby/ranking" },
       { label: "Desafio diário", href: "/jogar" },
       { label: "Entrar", href: "/login" },
     ],
@@ -80,7 +80,16 @@ const FOOTER_LINKS = [
 
 export function Footer() {
   return (
-    <footer className="relative border-t border-border bg-background">
+    <footer className="relative overflow-hidden border-t border-border bg-background">
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 bg-grid-fade opacity-40 dark:opacity-30"
+      />
+      <div
+        aria-hidden
+        className="absolute -top-32 left-1/2 -z-10 h-64 w-2/3 -translate-x-1/2 rounded-full bg-blue-500/10 blur-[120px] dark:bg-blue-500/15"
+      />
+
       <div className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_2fr]">
           <div>
@@ -110,7 +119,7 @@ export function Footer() {
                       : undefined
                   }
                   aria-label={social.label}
-                  className="flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors duration-300 hover:border-primary/40 hover:bg-muted hover:text-foreground"
+                  className="flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-muted hover:text-foreground hover:shadow-lg hover:shadow-blue-500/10"
                 >
                   <social.icon className="size-4" />
                 </a>
@@ -144,7 +153,16 @@ export function Footer() {
         <Separator className="my-10" />
 
         <div className="flex flex-col items-center justify-between gap-4 text-xs text-muted-foreground sm:flex-row">
-          <p>© {new Date().getFullYear()} UEMGuessr. Projeto feito com carinho em Maringá.</p>
+          <p>
+            © {new Date().getFullYear()} UEMGuessr. Desenvolvido por{" "}
+            <Link
+              href="https://www.instagram.com/henriquetutomu/"
+              target="_blank"
+              className="text-blue-600 hover:underline"
+            >
+              Henrique Sagawa
+            </Link>
+          </p>
           <p className="max-w-md text-center sm:text-right">
             Não é um projeto oficial da Universidade Estadual de Maringá.
           </p>

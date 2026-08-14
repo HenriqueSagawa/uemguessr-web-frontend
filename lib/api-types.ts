@@ -258,6 +258,32 @@ export interface LatLng {
   longitude: number;
 }
 
+export type SeasonStatus = "PREVIEW" | "ACTIVE" | "ENDED";
+
+export interface AdminSeason {
+  id: string;
+  name: string;
+  status: SeasonStatus;
+  startsAt: string;
+  endsAt: string | null;
+  createdAt: string;
+}
+
+export type AdminSeasonCreateInput = {
+  name?: string;
+};
+
+export interface AdminLocation {
+  id: string;
+  name: string;
+  description: string | null;
+  latitude: string;
+  longitude: string;
+  imageUrl: string | null;
+  imagePublicId: string | null;
+  createdAt: string;
+}
+
 export interface RankedMatchState {
   match: {
     id: string;
@@ -284,6 +310,9 @@ export interface RankedMatchState {
     username: string;
     displayName: string | null;
     avatarUrl: string | null;
+    rating: number | null;
+    division: DivisionKey | null;
+    divisionLabel: string | null;
   };
   currentRound: {
     roundNumber: number;

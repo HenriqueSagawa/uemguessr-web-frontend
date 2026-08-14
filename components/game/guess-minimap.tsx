@@ -10,10 +10,11 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Check, Loader2, X } from "lucide-react";
+import { Check, Loader2, Minimize2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { LatLng } from "@/lib/api-types";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "motion/react";
 
 const CENTER: LatLng = { latitude: -23.4102, longitude: -51.9377 };
 const TILE_URL = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -79,6 +80,8 @@ interface GuessMinimapProps {
   onConfirm: () => void;
   submitting?: boolean;
   disabled?: boolean;
+  timeLeft?: number;
+  totalTime?: number;
 }
 
 export function GuessMinimap({
@@ -88,10 +91,13 @@ export function GuessMinimap({
   onConfirm,
   submitting = false,
   disabled = false,
+  timeLeft,
+  totalTime,
 }: GuessMinimapProps) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [showHint, setShowHint] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -99,16 +105,32 @@ export function GuessMinimap({
     return () => cancelAnimationFrame(frame);
   }, []);
 
+  const hasGuess = guess != null;
+
   useEffect(() => {
     const onPointerDown = (event: PointerEvent) => {
       if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-        setDismissed(true);
+        // Only auto-close if no guess is placed
+        if (!hasGuess) {
+          setOpen(false);
+          setDismissed(true);
+        }
       }
     };
     document.addEventListener("pointerdown", onPointerDown, true);
     return () => document.removeEventListener("pointerdown", onPointerDown, true);
-  }, []);
+  }, [hasGuess]);
+
+  // Hint logic
+  useEffect(() => {
+    if (open && !hasGuess) {
+      setShowHint(true);
+      const t = setTimeout(() => setShowHint(false), 3000);
+      return () => clearTimeout(t);
+    } else {
+      setShowHint(false);
+    }
+  }, [open, hasGuess]);
 
   const icon = useMemo(
     () =>
@@ -121,7 +143,6 @@ export function GuessMinimap({
     []
   );
 
-  const hasGuess = guess != null;
   const expanded = !dismissed && (open || (hasGuess && !disabled));
   const interactive = expanded && !disabled;
   const canConfirm = hasGuess && !disabled;
@@ -137,15 +158,31 @@ export function GuessMinimap({
           setDismissed(false);
           setOpen(true);
         }}
-        onMouseLeave={() => setOpen(false)}
+        onMouseLeave={() => {
+          if (!hasGuess) {
+            setOpen(false);
+          }
+        }}
       >
         {mounted ? (
-          <div
+          <motion.div
+            layout
+            initial={false}
+            animate={{
+              height: expanded ? "var(--expanded-h)" : "var(--collapsed-h)",
+              width: expanded ? "var(--expanded-w)" : "var(--collapsed-w)",
+            }}
+            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+            style={{
+              "--expanded-w": "min(90vw, 30rem)",
+              "--expanded-h": "26rem",
+              "--collapsed-w": "11rem",
+              "--collapsed-h": "6rem",
+            } as any}
             className={cn(
-              "overflow-hidden rounded-2xl border bg-background shadow-2xl transition-all duration-300",
-              expanded
-                ? "h-72 w-[20rem] p-2 sm:h-[26rem] sm:w-[30rem]"
-                : "h-24 w-44 p-0"
+              "overflow-hidden rounded-2xl bg-background shadow-2xl relative",
+              canConfirm && expanded ? "border-2 border-green-500/80 animate-pulse-border" : "border",
+              expanded ? "p-2" : "p-0"
             )}
           >
             <div
@@ -181,7 +218,7 @@ export function GuessMinimap({
 
               {!expanded ? (
                 <div className="pointer-events-none absolute inset-0 grid place-items-center">
-                  <span className="grid size-10 place-items-center rounded-full bg-background/85 text-muted-foreground backdrop-blur-sm">
+                  <span className="grid size-10 place-items-center rounded-full bg-background/85 text-muted-foreground backdrop-blur-sm shadow-sm">
                     <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10" />
                       <path d="m2 12 10-3 10 3" />
@@ -192,21 +229,61 @@ export function GuessMinimap({
                 </div>
               ) : null}
 
+              {/* Top Right Controls (Minimize) */}
               {expanded ? (
                 <button
                   type="button"
-                  onClick={() => {
-                    onClear();
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setOpen(false);
+                    setDismissed(true);
                   }}
-                  aria-label="Fechar minimapa"
-                  className="absolute right-2 top-2 z-[1000] grid size-7 cursor-pointer place-items-center rounded-full bg-background/85 text-muted-foreground shadow-sm backdrop-blur-sm transition-colors hover:text-foreground"
+                  aria-label="Minimizar mapa"
+                  className="absolute right-2 top-2 z-[1000] grid size-8 cursor-pointer place-items-center rounded-full bg-background/85 text-muted-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-background hover:text-foreground"
                 >
-                  <X className="size-3.5" />
+                  <Minimize2 className="size-4" />
                 </button>
               ) : null}
+
+              {/* Top Left Time info (if provided) */}
+              {expanded && timeLeft !== undefined && (
+                <div className="absolute left-2 top-2 z-[1000] flex items-center gap-1.5 rounded-full bg-background/85 px-3 py-1.5 text-sm font-medium shadow-sm backdrop-blur-sm">
+                  <span className={cn(timeLeft < 10 ? "text-red-500 font-bold" : "text-foreground")}>
+                    {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")}
+                  </span>
+                </div>
+              )}
+
+              {/* Bottom Right Controls (Clear Guess) */}
+              {expanded && hasGuess && !disabled ? (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClear();
+                  }}
+                  aria-label="Limpar palpite"
+                  className="absolute right-2 bottom-2 z-[1000] grid size-8 cursor-pointer place-items-center rounded-full bg-destructive/90 text-destructive-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-destructive"
+                >
+                  <Trash2 className="size-4" />
+                </button>
+              ) : null}
+
+              {/* Hint Overlay */}
+              <AnimatePresence>
+                {expanded && showHint && !hasGuess && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000] rounded-full bg-foreground/90 px-4 py-2 text-sm font-medium text-background shadow-lg"
+                  >
+                    Clique no mapa para marcar seu palpite
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-          </div>
+          </motion.div>
         ) : null}
       </div>
 

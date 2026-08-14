@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "motion/react";
 import { ArrowRight, CheckCircle2, Sparkles, Target, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GameMap } from "@/components/game/game-map";
@@ -33,7 +34,12 @@ export function RoundResultView({
   const perfect = distanceMeters < 15;
 
   return (
-    <div className="flex h-full flex-col gap-3">
+    <motion.div 
+      initial={{ y: 50, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="flex h-full flex-col gap-3"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card px-4 py-3 shadow-sm">
         <span className="text-sm font-medium tracking-tight">
           Rodada {roundNumber} de {totalRounds}
@@ -44,22 +50,36 @@ export function RoundResultView({
         </span>
       </div>
 
-      <div className="relative min-h-[24rem] flex-1 overflow-hidden rounded-3xl border bg-muted shadow-inner">
+      <div className="relative min-h-[30rem] flex-1 overflow-hidden rounded-3xl border bg-muted shadow-inner">
         <GameMap
           guess={guess}
           correct={correct}
           disabled
           className="h-full w-full"
         />
-        <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center p-4">
-          <span className="rounded-full bg-black/70 px-4 py-2 text-xs font-medium text-white shadow-lg backdrop-blur-md">
+        <motion.div 
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="pointer-events-none absolute inset-x-0 top-0 flex justify-center p-4"
+        >
+          <span className="rounded-full bg-black/80 px-6 py-3 text-sm font-medium text-white shadow-xl backdrop-blur-md border border-white/10">
             O lugar real ficava a{" "}
-            <span className="font-bold tabular-nums">
+            <span className="font-bold tabular-nums text-primary-foreground">
               {formatDistance(distanceMeters)}
             </span>{" "}
             do seu palpite
           </span>
-        </div>
+        </motion.div>
+        
+        {perfect && (
+          <div className="pointer-events-none absolute inset-0 overflow-hidden flex justify-center items-center">
+             <div className="confetti-particle absolute top-[30%] left-[40%] text-2xl">✨</div>
+             <div className="confetti-particle absolute top-[20%] left-[60%] text-3xl" style={{ animationDelay: "0.1s" }}>🎉</div>
+             <div className="confetti-particle absolute top-[40%] left-[50%] text-xl" style={{ animationDelay: "0.2s" }}>🎊</div>
+             <div className="confetti-particle absolute top-[25%] left-[45%] text-2xl" style={{ animationDelay: "0.15s" }}>⭐</div>
+          </div>
+        )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
       </div>
 
@@ -75,23 +95,28 @@ export function RoundResultView({
             <p className="mt-0.5 text-xs text-muted-foreground">de distância</p>
           </div>
         </div>
-        <div
+        
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5, type: "spring" }}
           className={cn(
-            "flex items-center gap-3 rounded-2xl border bg-card px-4 py-3",
-            perfect && "border-emerald-500/30"
+            "flex items-center gap-3 rounded-2xl border bg-card px-4 py-3 relative overflow-hidden",
+            perfect && "border-emerald-500/50 bg-emerald-500/5"
           )}
         >
+          {perfect && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-500/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />}
           <span
             className={cn(
-              "grid size-9 shrink-0 place-items-center rounded-full",
+              "grid size-9 shrink-0 place-items-center rounded-full relative z-10",
               perfect
-                ? "bg-emerald-500/10 text-emerald-500"
+                ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                 : "bg-primary/10 text-primary"
             )}
           >
             {perfect ? <Sparkles className="size-4" /> : <CheckCircle2 className="size-4" />}
           </span>
-          <div className="text-left">
+          <div className="text-left relative z-10">
             <p className="font-mono text-lg font-semibold leading-none tabular-nums">
               +{formatScore(roundScore)} pts
             </p>
@@ -99,13 +124,20 @@ export function RoundResultView({
               {perfect ? "Palpite perfeito!" : "pontos ganhos"}
             </p>
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      <Button className="h-11 w-full rounded-2xl text-base" onClick={onNext}>
-        {isLast ? "Ver resultado final" : "Próxima rodada"}
-        <ArrowRight />
+      <Button className="h-12 w-full rounded-2xl text-base flex flex-col items-center justify-center gap-0.5 py-2" onClick={onNext}>
+        <span className="flex items-center gap-2">
+          {isLast ? "Ver resultado final" : "Próxima rodada"}
+          <ArrowRight className="size-4" />
+        </span>
+        {!isLast && (
+          <span className="text-[10px] font-normal opacity-70">
+            Rodada {roundNumber} de {totalRounds} concluída
+          </span>
+        )}
       </Button>
-    </div>
+    </motion.div>
   );
 }

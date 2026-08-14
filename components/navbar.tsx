@@ -36,7 +36,7 @@ export function Navbar({ className }: { className?: string }) {
   const lastScrollY = useRef(0);
 
   const mounted = useSyncExternalStore(
-    () => () => {},
+    () => () => { },
     () => true,
     () => false
   );

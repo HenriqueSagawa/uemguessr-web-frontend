@@ -10,6 +10,7 @@ interface RevealProps {
   delay?: number;
   y?: number;
   scale?: number;
+  blur?: boolean;
   className?: string;
   as?: "div" | "span";
 }
@@ -19,6 +20,7 @@ export function Reveal({
   delay = 0,
   y = 24,
   scale = 1,
+  blur = false,
   className,
   as = "div",
 }: RevealProps) {
@@ -27,9 +29,15 @@ export function Reveal({
 
   return (
     <MotionTag
-      initial={reducedMotion ? { opacity: 0, scale } : { opacity: 0, y, scale }}
+      initial={
+        reducedMotion
+          ? { opacity: 0, scale }
+          : { opacity: 0, y, scale, ...(blur ? { filter: "blur(8px)" } : {}) }
+      }
       whileInView={
-        reducedMotion ? { opacity: 1, scale: 1 } : { opacity: 1, y: 0, scale: 1 }
+        reducedMotion
+          ? { opacity: 1, scale: 1 }
+          : { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
       }
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.7, delay, ease }}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react";
 import {
   ArrowRight,
   CalendarDays,
@@ -78,8 +79,17 @@ export function GameModes() {
         aria-hidden
         className="absolute right-[-18%] bottom-0 -z-10 size-[32rem] rounded-full bg-blue-500/10 blur-[140px] dark:bg-blue-500/15"
       />
+      <div
+        aria-hidden
+        className="absolute left-[-12%] top-10 -z-10 size-[26rem] rounded-full bg-violet-500/10 blur-[130px] dark:bg-violet-500/15"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-20 bg-grid-fade opacity-50 dark:opacity-40"
+      />
+
       <div className="mx-auto max-w-6xl px-6">
-        <Reveal>
+        <Reveal blur>
           <SectionHeading
             eyebrow="Modos de Jogo"
             title="Do treino ao desafio do dia"
@@ -109,53 +119,75 @@ export function GameModes() {
               <TabsContent
                 key={mode.value}
                 value={mode.value}
-                className="mx-auto max-w-3xl rounded-3xl border border-border bg-card p-6 shadow-xl shadow-foreground/5 sm:p-10"
+                className="mx-auto max-w-3xl"
               >
-                <div className="flex flex-col items-start gap-8 sm:flex-row sm:items-center">
-                  <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500/15 via-indigo-500/15 to-violet-500/15 ring-1 ring-primary/10">
-                    <mode.icon className="size-6 text-primary" />
-                  </div>
+                <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-xl shadow-foreground/5 sm:p-10">
+                  <div
+                    aria-hidden
+                    className="absolute -top-24 -right-24 size-56 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-500/15"
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute -bottom-24 -left-24 size-56 rounded-full bg-violet-500/10 blur-3xl dark:bg-violet-500/15"
+                  />
 
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-xl font-semibold tracking-tight text-foreground">
-                        {mode.kicker}
-                      </h3>
-                      {mode.value === "diario" ? (
-                        <Badge className="bg-orange-500/15 text-orange-600 ring-1 ring-orange-500/20 dark:bg-orange-500/20 dark:text-orange-400">
-                          Mais popular
-                        </Badge>
-                      ) : null}
-                    </div>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {mode.description}
-                    </p>
-                  </div>
-                </div>
-
-                <ul className="mt-8 grid gap-3 sm:grid-cols-3">
-                  {mode.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-start gap-2.5 rounded-xl border border-border/70 bg-muted/40 px-3.5 py-3 text-[13px] leading-snug text-muted-foreground"
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`${mode.value}-content`}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                      className="relative"
                     >
-                      <Check className="mt-0.5 size-3.5 shrink-0 text-emerald-500" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
+                      <div className="flex flex-col items-start gap-8 sm:flex-row sm:items-center">
+                        <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500/15 via-indigo-500/15 to-violet-500/15 ring-1 ring-primary/10">
+                          <mode.icon className="size-6 text-primary" />
+                        </div>
 
-                <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <span className="text-xs text-muted-foreground">
-                    Sem cadastro obrigatório para começar
-                  </span>
-                  <Button
-                    render={<Link href={mode.href} />}
-                    className="group rounded-full px-6"
-                  >
-                    {mode.cta}
-                    <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-                  </Button>
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-xl font-semibold tracking-tight text-foreground">
+                              {mode.kicker}
+                            </h3>
+                            {mode.value === "diario" ? (
+                              <Badge className="bg-orange-500/15 text-orange-600 ring-1 ring-orange-500/20 dark:bg-orange-500/20 dark:text-orange-400">
+                                Mais popular
+                              </Badge>
+                            ) : null}
+                          </div>
+                          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                            {mode.description}
+                          </p>
+                        </div>
+                      </div>
+
+                      <ul className="mt-8 grid gap-3 sm:grid-cols-3">
+                        {mode.features.map((feature) => (
+                          <li
+                            key={feature}
+                            className="flex items-start gap-2.5 rounded-xl border border-border/70 bg-muted/40 px-3.5 py-3 text-[13px] leading-snug text-muted-foreground transition-colors duration-300 hover:border-emerald-500/30 hover:bg-emerald-500/5"
+                          >
+                            <Check className="mt-0.5 size-3.5 shrink-0 text-emerald-500" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+
+                      <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <span className="text-xs text-muted-foreground">
+                          Sem cadastro obrigatório para começar
+                        </span>
+                        <Button
+                          render={<Link href={mode.href} />}
+                          className="group rounded-full px-6"
+                        >
+                          {mode.cta}
+                          <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                        </Button>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
               </TabsContent>
             ))}

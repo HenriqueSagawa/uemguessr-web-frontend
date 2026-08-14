@@ -11,6 +11,7 @@ const STEPS = [
     title: "Sua rodada começa",
     description:
       "Uma foto de um ponto do campus aparece na tela — pode ser um bloco, um pátio ou um canto escondido.",
+    gradient: "from-blue-500 to-cyan-400",
   },
   {
     number: "02",
@@ -18,6 +19,7 @@ const STEPS = [
     title: "Marque no mapa",
     description:
       "Arraste o marcador — ou digite o nome do local — até onde você acha que a foto foi tirada.",
+    gradient: "from-violet-500 to-fuchsia-400",
   },
   {
     number: "03",
@@ -25,6 +27,7 @@ const STEPS = [
     title: "Pontue pela distância",
     description:
       "Quanto mais perto, mais pontos: até 5.000 por rodada. Mas atenção, erros gigantes cobram caro.",
+    gradient: "from-emerald-500 to-teal-400",
   },
   {
     number: "04",
@@ -32,6 +35,7 @@ const STEPS = [
     title: "Repita e some",
     description:
       "São 5 rodadas por partida. Ao final, some os pontos e descubra seu lugar no ranking.",
+    gradient: "from-amber-500 to-orange-400",
   },
 ];
 
@@ -47,11 +51,15 @@ export function HowItWorks() {
       />
       <div
         aria-hidden
-        className="absolute inset-0 -z-20 bg-grid-mask opacity-60 dark:opacity-40"
+        className="absolute right-[-10%] top-10 -z-10 size-[24rem] rounded-full bg-violet-500/10 blur-[120px] dark:bg-violet-500/15"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-20 bg-grid-fade opacity-50 dark:opacity-40"
       />
 
       <div className="mx-auto max-w-6xl px-6">
-        <Reveal>
+        <Reveal blur>
           <SectionHeading
             eyebrow="Como funciona"
             title="Uma foto, um palpite, pontos na conta"
@@ -59,7 +67,7 @@ export function HowItWorks() {
           />
         </Reveal>
 
-        <div className="relative mt-16 grid gap-10 sm:gap-6 lg:grid-cols-4 lg:gap-4">
+        <div className="relative mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
           <div
             aria-hidden
             className="absolute left-0 right-0 top-[27px] hidden h-px bg-linear-to-r from-transparent via-primary/25 to-transparent lg:block"
@@ -67,22 +75,36 @@ export function HowItWorks() {
           {STEPS.map((step, index) => (
             <Reveal
               key={step.number}
-              delay={0.12 * index}
+              delay={0.1 * index}
+              blur
               className="relative flex flex-col items-start"
             >
-              <div className="relative z-10 flex size-14 items-center justify-center rounded-2xl border border-border bg-card shadow-lg shadow-foreground/5 ring-4 ring-background">
-                <step.icon className="size-5 text-primary" />
-              </div>
+              <div className="group relative z-10 w-full">
+                <div className="relative flex flex-col items-start rounded-3xl border border-border bg-card p-6 shadow-lg shadow-foreground/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10">
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 rounded-3xl bg-linear-to-br from-blue-500/[0.07] via-transparent to-violet-500/[0.07] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  />
 
-              <span className="mt-6 text-xs font-semibold tracking-widest text-muted-foreground">
-                PASSO {step.number}
-              </span>
-              <h3 className="mt-2 font-medium tracking-tight text-foreground">
-                {step.title}
-              </h3>
-              <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
-                {step.description}
-              </p>
+                  <div className="flex w-full items-start justify-between">
+                    <div
+                      className={`relative z-10 grid size-14 place-items-center rounded-2xl bg-linear-to-br ${step.gradient} text-white shadow-lg shadow-foreground/10 ring-4 ring-background`}
+                    >
+                      <step.icon className="size-5" />
+                    </div>
+                    <span className="text-3xl font-bold tracking-tighter text-foreground/10 transition-colors duration-300 group-hover:text-foreground/20">
+                      {step.number}
+                    </span>
+                  </div>
+
+                  <h3 className="mt-6 font-medium tracking-tight text-foreground">
+                    {step.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {step.description}
+                  </p>
+                </div>
+              </div>
             </Reveal>
           ))}
         </div>

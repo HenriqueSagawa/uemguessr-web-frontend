@@ -4,12 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Gauge, MapPin, Trophy } from "lucide-react";
 import { Reveal } from "@/components/reveal";
+import { NumberTicker } from "@/components/ui/number-ticker";
+import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
+import { BorderBeam } from "@/components/ui/border-beam";
 import { Button } from "@/components/ui/button";
 
 const STATS = [
-  { icon: MapPin, value: "12.480", label: "partidas jogadas" },
-  { icon: Gauge, value: "210 m", label: "erro médio no 1º chute" },
-  { icon: Trophy, value: "24.920", label: "recorde em pontos" },
+  { icon: MapPin, value: 12480, label: "partidas jogadas" },
+  { icon: Gauge, value: 210, suffix: " m", label: "erro médio no 1º chute" },
+  { icon: Trophy, value: 24920, label: "recorde em pontos" },
 ];
 
 const SPOTS = [
@@ -23,8 +26,15 @@ export function Quiz() {
   return (
     <section className="relative overflow-hidden py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-6">
-        <Reveal>
+        <Reveal blur>
           <div className="relative overflow-hidden rounded-[2rem] border border-border shadow-2xl shadow-foreground/10">
+            <BorderBeam
+              size={220}
+              duration={9}
+              colorFrom="#38bdf8"
+              colorTo="#8b5cf6"
+              reverse
+            />
             <Image
               src="/campus-satellite.jpg"
               alt="Vista aérea do campus sede da Universidade Estadual de Maringá"
@@ -41,18 +51,30 @@ export function Quiz() {
               aria-hidden
               className="absolute -bottom-24 -right-24 size-96 rounded-full bg-violet-500/25 blur-[120px]"
             />
+            <div
+              aria-hidden
+              className="absolute inset-0 bg-dots-fade opacity-30"
+            />
 
             <div className="relative flex flex-col items-center px-6 py-20 text-center sm:py-28">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-[11px] font-medium uppercase tracking-wider text-white/80 backdrop-blur-sm">
-                <span className="size-1.5 rounded-full bg-emerald-400" />
+                <span className="relative flex size-1.5">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+                </span>
                 Desafio aberto
               </span>
 
               <h2 className="mt-6 max-w-2xl text-[clamp(2.2rem,6vw,4.5rem)] font-semibold leading-[0.95] tracking-tighter text-white">
                 Você conhece a{" "}
-                <span className="bg-gradient-to-r from-sky-300 via-blue-300 to-violet-300 bg-clip-text text-transparent">
+                <AnimatedGradientText
+                  speed={0.9}
+                  colorFrom="#38bdf8"
+                  colorTo="#a78bfa"
+                  className="inline text-[clamp(2.2rem,6vw,4.5rem)] font-semibold leading-[0.95] tracking-tighter"
+                >
                   UEM?
-                </span>
+                </AnimatedGradientText>
               </h2>
 
               <p className="mt-5 max-w-xl text-base leading-relaxed text-white/70">
@@ -74,12 +96,22 @@ export function Quiz() {
 
               <div className="mt-12 flex flex-col items-center gap-10 sm:flex-row sm:justify-center sm:gap-14">
                 {STATS.map((stat) => (
-                  <div key={stat.label} className="flex flex-col items-center gap-1">
+                  <div
+                    key={stat.label}
+                    className="flex flex-col items-center gap-1"
+                  >
                     <span className="flex items-center gap-1.5 text-xl font-semibold tracking-tight text-white">
                       <stat.icon className="size-4 text-sky-300" />
-                      {stat.value}
+                      <NumberTicker
+                        value={stat.value}
+                        delay={0.3}
+                        className="text-xl font-semibold tracking-tight text-white"
+                      />
+                      <span className="text-white/60">{stat.suffix ?? ""}</span>
                     </span>
-                    <span className="text-xs text-white/60">{stat.label}</span>
+                    <span className="text-xs text-white/60">
+                      {stat.label}
+                    </span>
                   </div>
                 ))}
               </div>

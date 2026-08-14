@@ -6,13 +6,23 @@ import { Button } from "@/components/ui/button";
 
 interface GameShellProps {
   title: string;
+  subtitle?: string;
   fullBleed?: boolean;
+  showQuitButton?: boolean;
+  onQuit?: () => void;
   children: React.ReactNode;
 }
 
-export function GameShell({ title, fullBleed = false, children }: GameShellProps) {
+export function GameShell({ 
+  title, 
+  subtitle,
+  fullBleed = false, 
+  showQuitButton = true,
+  onQuit,
+  children 
+}: GameShellProps) {
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className={`flex min-h-dvh flex-col ${fullBleed ? "bg-background/95 dark:bg-background/50" : "bg-background"}`}>
       <header className="flex h-14 items-center justify-between border-b bg-card/80 px-4 backdrop-blur-sm sm:px-6">
         <div className="flex items-center gap-3">
           <Link
@@ -22,15 +32,32 @@ export function GameShell({ title, fullBleed = false, children }: GameShellProps
           >
             <Home className="size-4" />
           </Link>
-          <h1 className="text-sm font-semibold tracking-tight">{title}</h1>
+          <div className="flex flex-col">
+            <h1 className="text-sm font-semibold tracking-tight leading-none">{title}</h1>
+            {subtitle && (
+              <span className="text-[10px] text-muted-foreground mt-0.5">{subtitle}</span>
+            )}
+          </div>
         </div>
-        <Button
-          render={<Link href="/lobby" />}
-          variant="ghost"
-          className="rounded-full text-muted-foreground"
-        >
-          Desistir
-        </Button>
+        {showQuitButton && (
+          onQuit ? (
+            <Button
+              onClick={onQuit}
+              variant="ghost"
+              className="rounded-full text-muted-foreground"
+            >
+              Desistir
+            </Button>
+          ) : (
+            <Button
+              render={<Link href="/lobby" />}
+              variant="ghost"
+              className="rounded-full text-muted-foreground"
+            >
+              Desistir
+            </Button>
+          )
+        )}
       </header>
       <main
         className={

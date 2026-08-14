@@ -7,6 +7,7 @@ import {
   Gamepad2,
   LogOut,
   Settings,
+  ShieldCheck,
   Trophy,
   UserRound,
 } from "lucide-react";
@@ -105,6 +106,24 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroup>
         ))}
+
+        {user?.role === "ADMIN" ? (
+          <SidebarGroup>
+            <SidebarGroupLabel>Administração</SidebarGroupLabel>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive("/admin")}
+                  tooltip="Painel do administrador"
+                  render={<Link href="/admin/temporadas" />}
+                >
+                  <ShieldCheck />
+                  <span>Admin</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+        ) : null}
       </SidebarContent>
 
       <SidebarFooter>

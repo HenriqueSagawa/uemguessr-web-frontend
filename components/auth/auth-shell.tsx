@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Crosshair, MapPin, Trophy } from "lucide-react";
 
 const FEATURES = [
-  { icon: MapPin, text: "Mais de 120 locais espalhados pelo campus" },
+  { icon: MapPin, text: "Diversos locais espalhados pelo campus" },
   { icon: Crosshair, text: "Pontuação calculada pela distância do palpite" },
   { icon: Trophy, text: "Ranking geral, semanal e desafio diário" },
 ];
@@ -63,16 +63,6 @@ export function AuthShell({ children }: { children: ReactNode }) {
               ))}
             </ul>
           </div>
-
-          <figure className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-md">
-            <blockquote className="text-sm leading-relaxed text-white/85">
-              &ldquo;Encontrei o bloco onde tive minha primeira aula logo na
-              primeira rodada. Assustador.&rdquo;
-            </blockquote>
-            <figcaption className="mt-2.5 text-xs text-white/55">
-              Bia J. · Maringá
-            </figcaption>
-          </figure>
         </div>
       </aside>
 

@@ -1,19 +1,38 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, MapPin, Play, Trophy, Users } from "lucide-react";
+import { ArrowRight, MapPin, Play, Trophy } from "lucide-react";
+import { AuroraText } from "./ui/aurora-text";
+import { TextAnimate } from "./ui/text-animate";
+import { WordRotate } from "./ui/word-rotate";
+import { ShineBorder } from "./ui/shine-border";
+import { Safari } from "./ui/safari";
+import { Iphone } from "./ui/iphone";
+import { Marquee } from "./ui/marquee";
 import { Button } from "@/components/ui/button";
 
-const STATS = [
-  { icon: MapPin, value: "120+", label: "locais pelo campus" },
-  { icon: Trophy, value: "5", label: "rodadas por partida" },
-  { icon: Users, value: "1.000+", label: "jogadores" },
+const ease = [0.16, 1, 0.3, 1] as const;
+
+const SPOTS = [
+  "BCE",
+  "Bloco C56",
+  "Restaurante Universitário",
+  "Bloco D34",
 ];
 
-const ease = [0.16, 1, 0.3, 1] as const;
-const drift = { duration: 16, repeat: Infinity, ease: "easeInOut" as const };
+const MARQUEE_ITEMS = [
+  "Biblioteca Central",
+  "Restaurante Universitário",
+  "Bloco C56",
+  "Hospital Regional",
+  "Bloco D34",
+  "Centro de Tecnologia",
+  "Bloco B33",
+  "Ginásio de Esportes",
+  "Cantina Central",
+  "Bloco E46",
+];
 
 export function Hero() {
   const reducedMotion = useReducedMotion();
@@ -21,58 +40,15 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden bg-background">
       <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute left-1/2 top-[-35%] h-[80vh] w-[120vw] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.12),transparent_60%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(96,165,250,0.16),transparent_60%)]" />
-
-        <motion.div
-          className="absolute -top-1/3 left-[10%] h-[130%] w-44 -rotate-[24deg] bg-linear-to-b from-blue-500/20 via-blue-500/5 to-transparent blur-3xl"
-          animate={reducedMotion ? undefined : { x: [0, 50, 0] }}
-          transition={reducedMotion ? undefined : { ...drift, duration: 18 }}
-        />
-        <motion.div
-          className="absolute -top-1/3 left-[32%] h-[130%] w-24 -rotate-[14deg] bg-linear-to-b from-violet-500/15 via-violet-500/5 to-transparent blur-3xl"
-          animate={reducedMotion ? undefined : { x: [0, -40, 0] }}
-          transition={reducedMotion ? undefined : { ...drift, duration: 22 }}
-        />
-        <motion.div
-          className="absolute -top-1/3 right-[24%] h-[130%] w-32 rotate-[18deg] bg-linear-to-b from-cyan-500/15 via-cyan-500/5 to-transparent blur-3xl"
-          animate={reducedMotion ? undefined : { x: [0, 40, 0] }}
-          transition={reducedMotion ? undefined : { ...drift, duration: 20 }}
-        />
-        <motion.div
-          className="absolute -top-1/3 right-[6%] h-[130%] w-20 rotate-[30deg] bg-linear-to-b from-blue-500/20 via-blue-500/5 to-transparent blur-3xl"
-          animate={reducedMotion ? undefined : { x: [0, -30, 0] }}
-          transition={reducedMotion ? undefined : { ...drift, duration: 17 }}
-        />
-
-        <motion.div
-          className="absolute -left-40 top-1/4 size-[32rem] rounded-full bg-blue-500/15 blur-[130px] dark:bg-blue-500/20"
-          animate={reducedMotion ? undefined : { x: [0, 50, 0], y: [0, 30, 0] }}
-          transition={reducedMotion ? undefined : { ...drift, duration: 24 }}
-        />
-        <motion.div
-          className="absolute -right-32 top-1/2 size-[28rem] rounded-full bg-violet-500/15 blur-[120px] dark:bg-violet-500/20"
-          animate={reducedMotion ? undefined : { x: [0, -40, 0], y: [0, -24, 0] }}
-          transition={reducedMotion ? undefined : { ...drift, duration: 26 }}
-        />
-
-        <div
-          className="absolute inset-0 opacity-70 dark:opacity-50"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
-            maskImage:
-              "radial-gradient(ellipse 70% 60% at 50% 40%, black, transparent)",
-            WebkitMaskImage:
-              "radial-gradient(ellipse 70% 60% at 50% 40%, black, transparent)",
-          }}
-        />
+        <div className="absolute inset-0 bg-grid-fade opacity-50 dark:opacity-40" />
+        <div className="absolute left-[-15%] top-1/3 h-[30rem] w-[30rem] rounded-full bg-blue-500/10 blur-[130px] dark:bg-blue-500/15" />
+        <div className="absolute right-[-10%] top-10 h-[24rem] w-[24rem] rounded-full bg-violet-500/10 blur-[120px] dark:bg-violet-500/15" />
       </div>
 
-      <div className="mx-auto grid min-h-screen max-w-6xl items-center gap-14 px-6 py-24 lg:grid-cols-2 lg:gap-20">
+      <div className="mx-auto grid min-h-screen max-w-6xl items-center gap-16 px-6 pb-24 pt-28 lg:grid-cols-2 lg:gap-16 lg:pb-20">
         <div className="flex flex-col items-start text-left">
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1, ease }}
             className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/60 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur-sm"
@@ -86,7 +62,7 @@ export function Hero() {
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 28 }}
+            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.25, ease }}
             className="mt-7 flex flex-col"
@@ -94,29 +70,42 @@ export function Hero() {
             <span className="text-[clamp(2rem,4.5vw,3.5rem)] font-normal tracking-tight text-foreground/40">
               Você conhece
             </span>
-            <span className="text-[clamp(3rem,7vw,6.5rem)] font-semibold leading-[0.9] tracking-tighter text-foreground">
-              a{" "}
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent dark:from-sky-400 dark:via-blue-400 dark:to-violet-400">
-                UEM?
-              </span>
+            <span className="mt-1 text-[clamp(3rem,7vw,6.5rem)] font-semibold leading-[0.9] tracking-tighter text-foreground">
+              a <AuroraText>UEM?</AuroraText>
             </span>
           </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.4, ease }}
+          <TextAnimate
+            by="word"
+            animation="blurInUp"
+            duration={0.4}
+            delay={0.45}
+            startOnView={false}
+            once
             className="mt-6 max-w-md text-base leading-relaxed text-muted-foreground"
           >
             Explore o campus, teste sua memória e descubra cantos que você nunca
             percebeu. Cada rodada é uma nova aventura pela Universidade Estadual
             de Maringá.
-          </motion.p>
+          </TextAnimate>
 
           <motion.div
-            initial={{ opacity: 0, y: 28 }}
+            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.55, ease }}
+            transition={{ duration: 0.6, delay: 0.6, ease }}
+            className="mt-5 flex items-center gap-2 text-sm text-muted-foreground"
+          >
+            <span>Próximo palpite:</span>
+            <WordRotate
+              words={SPOTS}
+              className="text-sm font-semibold text-foreground"
+            />
+          </motion.div>
+
+          <motion.div
+            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.75, ease }}
             className="mt-9 flex flex-col gap-3 sm:flex-row"
           >
             <Button
@@ -139,70 +128,123 @@ export function Hero() {
               Como funciona
             </Button>
           </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.75, ease }}
-            className="mt-14 flex items-center gap-10 sm:gap-12"
-          >
-            {STATS.map((stat) => (
-              <div key={stat.label} className="flex flex-col items-start gap-1">
-                <span className="flex items-center gap-1.5 text-lg font-semibold tracking-tight text-foreground">
-                  <stat.icon className="size-4 text-muted-foreground" />
-                  {stat.value}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {stat.label}
-                </span>
-              </div>
-            ))}
-          </motion.div>
         </div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.96, y: 24 }}
+          initial={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 24 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.4, ease }}
-          className="relative"
+          className="relative mx-auto w-full max-w-[37rem] pt-8 pb-16 sm:pt-10 sm:pb-20"
         >
-          <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-linear-to-br from-blue-500/20 via-violet-500/10 to-transparent blur-2xl dark:from-blue-500/30 dark:via-violet-500/20" />
-          <div className="relative overflow-hidden rounded-3xl border border-border shadow-2xl shadow-foreground/10">
-            <div className="relative aspect-[4/5] w-full lg:aspect-[5/5.6]">
-              <Image
-                src="/foto-area.png"
-                alt="Vista de satélite do campus sede da Universidade Estadual de Maringá"
-                fill
-                priority
-                sizes="(min-width: 1024px) 44vw, 92vw"
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-black/10" />
-            </div>
+          <div
+            aria-hidden
+            className="absolute -inset-8 -z-10 rounded-[3.5rem] bg-linear-to-br from-blue-500/25 via-violet-500/15 to-cyan-500/20 blur-3xl dark:from-blue-500/30 dark:via-violet-500/20 dark:to-cyan-500/25"
+          />
+
+          <div className="relative rounded-[14px]">
+            <Safari
+              url="uemguessr.app"
+              imageSrc="/foto-area.png"
+              mode="default"
+              className="drop-shadow-[0_24px_48px_rgba(0,0,0,0.25)]"
+            />
+            <ShineBorder
+              shineColor={["#3b82f6", "#8b5cf6", "#06b6d4", "#3b82f6"]}
+              borderWidth={1.5}
+              duration={12}
+            />
           </div>
 
-          <p className="mt-3 text-right text-[10px] text-muted-foreground/70">
-            Imagem: Esri, Maxar, Earthstar Geographics
-          </p>
+          <motion.div
+            initial={
+              reducedMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: 30, x: -10, rotate: -2 }
+            }
+            animate={{ opacity: 1, y: 0, x: 0, rotate: -2 }}
+            transition={{ duration: 0.9, delay: 0.9, ease }}
+            className="absolute -bottom-4 -left-4 z-20 w-[42%] min-w-[9.5rem] sm:-left-10 sm:w-[37%]"
+          >
+            <Iphone
+              src="/foto-uem.webp"
+              className="drop-shadow-[0_36px_48px_rgba(0,0,0,0.35)]"
+            />
+          </motion.div>
+
+          <motion.div
+            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.7, delay: 1.15, ease }}
+            className="absolute -top-5 -right-3 z-30 flex items-center gap-3 rounded-2xl border border-border/60 bg-white/80 px-4 py-3 shadow-xl shadow-black/10 backdrop-blur-md dark:bg-black/50"
+          >
+            <div className="grid size-9 place-items-center rounded-xl bg-linear-to-br from-blue-500 to-violet-500 text-white shadow-lg shadow-blue-500/30">
+              <Trophy className="size-4" />
+            </div>
+            <div>
+              <p className="text-sm font-bold leading-none text-foreground">
+                4.850 pts
+              </p>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Recorde da rodada
+              </p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.7, delay: 1.3, ease }}
+            className="absolute -top-6 -left-2 z-30 hidden items-center gap-2 rounded-full border border-border/60 bg-white/80 px-3.5 py-2 shadow-lg shadow-black/5 backdrop-blur-md sm:flex dark:bg-black/50"
+          >
+            <MapPin className="size-3.5 text-blue-500" />
+            <span className="text-xs font-medium text-foreground">
+              Campus Sede
+            </span>
+          </motion.div>
+
+          <motion.div
+            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.7, delay: 1.45, ease }}
+            className="absolute -bottom-2 right-2 z-30 flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2 backdrop-blur-md sm:right-6"
+          >
+            <span className="relative flex size-1.5">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+            </span>
+            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+              Acertou em 12 m
+            </span>
+          </motion.div>
         </motion.div>
       </div>
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1.3 }}
-        className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 lg:block"
+        transition={{ duration: 0.8, delay: 1.6 }}
+        className="relative border-y border-border/60 bg-background/60 py-4 backdrop-blur-sm"
       >
-        <div className="flex h-9 w-5 items-start justify-center rounded-full border border-foreground/20 p-1.5">
-          <motion.span
-            className="size-1 rounded-full bg-foreground/50"
-            animate={reducedMotion ? undefined : { y: [0, 8, 0], opacity: [1, 0.2, 1] }}
-            transition={
-              reducedMotion
-                ? undefined
-                : { duration: 1.8, repeat: Infinity, ease: "easeInOut" }
-            }
+        <div className="relative flex items-center overflow-hidden">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-linear-to-r from-background to-transparent"
           />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-linear-to-l from-background to-transparent"
+          />
+          <Marquee repeat={2} pauseOnHover className="[--gap:3rem] [--duration:45s]">
+            {MARQUEE_ITEMS.map((item) => (
+              <span
+                key={item}
+                className="flex items-center gap-3 text-sm font-medium text-muted-foreground"
+              >
+                <MapPin className="size-4 text-blue-500/70" />
+                {item}
+              </span>
+            ))}
+          </Marquee>
         </div>
       </motion.div>
     </section>

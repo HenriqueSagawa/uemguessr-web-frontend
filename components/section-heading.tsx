@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 
 interface SectionHeadingProps {
   eyebrow: string;
@@ -8,6 +9,7 @@ interface SectionHeadingProps {
   description?: string;
   align?: "center" | "left";
   icon?: LucideIcon;
+  gradient?: boolean;
   className?: string;
 }
 
@@ -17,13 +19,16 @@ export function SectionHeading({
   description,
   align = "center",
   icon: Icon,
+  gradient = false,
   className,
 }: SectionHeadingProps) {
+  const centered = align === "center";
+
   return (
     <div
       className={cn(
         "flex flex-col gap-4",
-        align === "center" && "items-center text-center",
+        centered && "items-center text-center",
         className
       )}
     >
@@ -37,14 +42,25 @@ export function SectionHeading({
       </span>
 
       <h2 className="max-w-2xl text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-[1.05] tracking-tighter text-foreground">
-        {title}
+        {gradient ? (
+          <AnimatedGradientText
+            speed={0.8}
+            colorFrom="#3b82f6"
+            colorTo="#8b5cf6"
+            className="inline text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-[1.05] tracking-tighter"
+          >
+            {title}
+          </AnimatedGradientText>
+        ) : (
+          title
+        )}
       </h2>
 
       {description ? (
         <p
           className={cn(
             "max-w-xl text-base leading-relaxed text-muted-foreground",
-            align === "center" && "mx-auto"
+            centered && "mx-auto"
           )}
         >
           {description}

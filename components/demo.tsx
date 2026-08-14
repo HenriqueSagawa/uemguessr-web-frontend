@@ -6,6 +6,7 @@ import { Clapperboard, MousePointerClick, Play } from "lucide-react";
 import { Reveal } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
+import { BorderBeam } from "@/components/ui/border-beam";
 
 export function Demo() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -28,8 +29,17 @@ export function Demo() {
         aria-hidden
         className="absolute left-1/2 top-0 -z-10 h-px w-2/3 -translate-x-1/2 bg-linear-to-r from-transparent via-primary/30 to-transparent"
       />
+      <div
+        aria-hidden
+        className="absolute left-1/2 top-1/3 -z-20 size-[32rem] -translate-x-1/2 rounded-full bg-blue-500/10 blur-[140px] dark:bg-blue-500/15"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 bg-grid-fade opacity-40 dark:opacity-30"
+      />
+
       <div className="mx-auto max-w-5xl px-6">
-        <Reveal>
+        <Reveal blur>
           <SectionHeading
             eyebrow="Demonstração"
             icon={Clapperboard}
@@ -38,13 +48,36 @@ export function Demo() {
           />
         </Reveal>
 
-        <Reveal delay={0.15} className="mt-14">
+        <Reveal delay={0.15} blur className="mt-14">
           <div className="relative">
             <div
               aria-hidden
-              className="absolute -inset-5 -z-10 rounded-[2.5rem] bg-linear-to-br from-blue-500/15 via-violet-500/10 to-transparent blur-2xl dark:from-blue-500/25 dark:via-violet-500/15"
+              className="absolute -inset-6 -z-10 rounded-[3rem] bg-linear-to-br from-blue-500/15 via-violet-500/10 to-cyan-500/10 blur-2xl dark:from-blue-500/25 dark:via-violet-500/15 dark:to-cyan-500/15"
             />
-            <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-2xl shadow-foreground/10">
+
+            <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-2xl shadow-foreground/10">
+              <BorderBeam
+                size={160}
+                duration={10}
+                colorFrom="#3b82f6"
+                colorTo="#8b5cf6"
+              />
+
+              <div className="relative flex items-center gap-3 border-b border-border bg-muted/40 px-4 py-3 sm:px-5">
+                <div className="flex items-center gap-1.5">
+                  <span className="size-3 rounded-full bg-red-400/90" />
+                  <span className="size-3 rounded-full bg-amber-400/90" />
+                  <span className="size-3 rounded-full bg-emerald-400/90" />
+                </div>
+                <div className="mx-auto flex flex-1 items-center justify-center">
+                  <span className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1 text-[11px] text-muted-foreground">
+                    <span className="size-1.5 rounded-full bg-emerald-500" />
+                    uemguessr.app/partida
+                  </span>
+                </div>
+                <div className="w-12" aria-hidden />
+              </div>
+
               <div className="relative">
                 {failed ? (
                   <div className="relative flex aspect-video w-full flex-col items-center justify-center gap-5 bg-card px-6 py-16 text-center sm:py-24">
@@ -91,8 +124,12 @@ export function Demo() {
                           <button
                             onClick={handlePlay}
                             aria-label="Reproduzir vídeo de demonstração"
-                            className="group/play flex size-20 cursor-pointer items-center justify-center rounded-full border border-white/25 bg-white/10 backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-white/20 sm:size-24"
+                            className="group/play relative flex size-20 cursor-pointer items-center justify-center rounded-full border border-white/25 bg-white/10 backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-white/20 sm:size-24"
                           >
+                            <span
+                              aria-hidden
+                              className="absolute inset-0 animate-ping rounded-full border border-white/20"
+                            />
                             <Play className="ml-1 size-8 fill-white text-white" />
                           </button>
                         </div>
@@ -110,7 +147,10 @@ export function Demo() {
                   Partida exemplo · Modo solo · Campus Sede
                 </span>
                 <span className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  <span className="size-1.5 rounded-full bg-emerald-500" />
+                  <span className="relative flex size-1.5">
+                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+                  </span>
                   Vídeo demonstrativo
                 </span>
               </div>
