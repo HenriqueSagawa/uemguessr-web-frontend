@@ -66,11 +66,39 @@ export function setAccessToken(token: string | null) {
 
 let refreshInFlight: Promise<string | null> | null = null;
 
+const REQUEST_TIMEOUT_MS = 20_000;
+
+async function fetchWithTimeout(url: string, init: RequestInit = {}) {
+  const controller = new AbortController();
+  const { signal } = init;
+  if (signal) {
+    if (signal.aborted) {
+      controller.abort();
+    } else {
+      signal.addEventListener("abort", () => controller.abort(), { once: true });
+    }
+  }
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError" && !signal?.aborted) {
+      throw new ApiError(
+        0,
+        "O servidor demorou para responder. Tente novamente em instantes."
+      );
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function refreshAccessToken(): Promise<string | null> {
   if (!refreshInFlight) {
     refreshInFlight = (async () => {
       try {
-        const response = await fetch(`${API_URL}/auth/refresh`, {
+        const response = await fetchWithTimeout(`${API_URL}/auth/refresh`, {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -103,7 +131,7 @@ async function doFetch(path: string, options: ApiOptions, token?: string) {
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
   }
-  return fetch(`${API_URL}${path}`, {
+  return fetchWithTimeout(`${API_URL}${path}`, {
     ...options,
     headers,
     credentials: "include",

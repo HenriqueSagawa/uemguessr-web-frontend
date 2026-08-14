@@ -24,6 +24,7 @@ export function SignupForm() {
   const [terms, setTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [maybeCreated, setMaybeCreated] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -65,9 +66,11 @@ export function SignupForm() {
           setError("Esse apelido ou email já está em uso. Tente outro.");
         } else {
           setError(err.message);
+          setMaybeCreated(true);
         }
       } else {
         setError("Não foi possível conectar ao servidor.");
+        setMaybeCreated(true);
       }
     } finally {
       setLoading(false);
@@ -155,9 +158,19 @@ export function SignupForm() {
         </div>
 
         {error ? (
-          <p role="alert" className="text-[13px] font-medium text-destructive">
-            {error}
-          </p>
+          <div className="flex flex-col gap-1">
+            <p role="alert" className="text-[13px] font-medium text-destructive">
+              {error}
+            </p>
+            {maybeCreated ? (
+              <Link
+                href={`/verificar-email?email=${encodeURIComponent(email.trim())}`}
+                className="text-[13px] font-medium text-primary transition-opacity hover:opacity-80"
+              >
+                Sua conta pode ter sido criada — reenviar o código de verificação
+              </Link>
+            ) : null}
+          </div>
         ) : null}
 
         <Label className="flex cursor-pointer items-start gap-2.5 text-[13px] leading-snug font-normal text-muted-foreground">
